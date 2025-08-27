@@ -1,51 +1,36 @@
-<?php 
+<?php
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
 
-header("content-type: application/json; charset=utf-8");
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
-include("helper.php");
+include('helper.php');
+include("../../connect.php");
 
-if ($_SERVER['REQUEST_METHOD'] == "DELETE") {
+if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+    if (isset($_GET['id']) && $_GET['id'] != "") {
+        $id = $_GET['id'];  
 
-    include "../../connect.php";
+        $search_id = $connect->query("SELECT * FROM users WHERE id='$id'");
+        $user = $search_id->fetch_assoc();
 
-    if (isset($_GET['id'])) {
-
-        $id = $_GET['id'];
-
-        if ($id != "") {
-
-            $read = $connect->query("SELECT * FROM users WHERE id = '$id'");
-
-            $user = $read->fetch_assoc();
-
-            if ($user) {
-                
-                $destroy = $connect->query("DELETE FROM users WHERE id = '$id'");
-    
-                $array_api = json_response(200, "Berhasil Menghapus");
-            } 
-            
-            else {
-                $array_api = json_response(404, "User tidak ditemukan");
-            }
+        if ($user != NULL) {
+            $delete = $connect->query("DELETE FROM users WHERE id='$id'");
+            $array_api = response_json(200, 'Berhasil menghapus data user');
+        } else {
+            $array_api = response_json(404, 'Gagal menghapus data user, user tidak ditemukan.');
         }
-
-        else {
-            $array_api = json_response(400, "ID tidak boleh kosong");
-        }
-
+    } else {
+        $array_api = response_json(400, 'Gagal menghapus data user, id tidak boleh kosong.');
     }
-
-    else {
-        $array_api = json_response(400, "ID tidak ditemukan");
-    }
-
 } else {
-
-    $array_api = json_response(405, "Method Not Allowed");
-
+    $array_api = response_json(405, 'Metode tidak diizinkan.');
 }
 
 echo json_encode($array_api);
-
 ?>

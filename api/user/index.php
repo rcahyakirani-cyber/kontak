@@ -1,22 +1,21 @@
 <?php
 
-header("Content-Type: application/json; charset=UTF-8");
-include("helper.php");
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
 
-if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    include("../../connect.php");
+include('helper.php');  
+include("../../connect.php");
 
+if($_SERVER['REQUEST_METHOD'] == 'GET') {
     $read = $connect->query("SELECT * FROM users");
     $result = $read->fetch_all(MYSQLI_ASSOC);
 
-    $array_api = json_response(200, "Berhasil", $result);
+    $array_api = response_json(200, 'berhasil mengambil data user', $result);
 }
-
-else{
-    $array_api = json_response(405, "Metode tidak diizinkan");
-}
+else {
+    $array_api = response_json(405, 'metode tidak diizinkan.');
+} 
 
 echo json_encode($array_api);
-
 
 ?>
